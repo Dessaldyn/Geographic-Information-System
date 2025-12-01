@@ -68,4 +68,11 @@ app.delete('/api/lokasi', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`🚀 Server jalan di http://localhost:${PORT}`));
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server jalan di http://localhost:${PORT}`);
+    });
+}
+
+// WAJIB: Export app agar Vercel bisa menjalankannya
+module.exports = app;
