@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // URL Backend Lokal Kita
     // Ganti ke link backend GO yang baru
     const apiUrl = 'https://gis-backend-golang.vercel.app/api/lokasi';
-    
+    // const apiUrl = 'http://localhost:3000/api/lokasi';
+
     // Inisialisasi Peta Leaflet (Default Jakarta)
     const map = L.map('map').setView([-6.200000, 106.816666], 12); 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

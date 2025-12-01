@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv" // Library baru untuk baca .env
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,23 +23,25 @@ var (
 )
 
 // --- 1. SETUP AWAL (INIT) ---
-// Fungsi init() jalan otomatis saat Vercel memulai serverless function
 func init() {
+	// COBA LOAD .ENV (Hanya untuk Lokal)
+	// Jika di Vercel, file .env tidak ada, jadi errornya kita abaikan saja
+	// karena Vercel pakai "Environment Variables" di settingannya.
+	_ = godotenv.Load()
+
 	connectDB()
 	setupRouter()
 }
 
-// --- 2. ENTRYPOINT VERCEL (PENTING!) ---
-// Vercel mencari fungsi bernama "Handler" ini. Jangan dihapus/ubah namanya.
+// --- 2. ENTRYPOINT VERCEL ---
 func Handler(w http.ResponseWriter, r *http.Request) {
 	app.ServeHTTP(w, r)
 }
 
-// --- 3. ENTRYPOINT LOKAL (LAPTOP) ---
-// Ini dipakai kalau kamu jalankan "go run main.go" di laptop
+// --- 3. ENTRYPOINT LOKAL ---
 func main() {
-	// Pastikan setup jalan jika dijalankan manual
 	if app == nil {
+		_ = godotenv.Load() // Load lagi untuk memastikan jika dijalankan manual
 		connectDB()
 		setupRouter()
 	}
@@ -47,17 +50,16 @@ func main() {
 	if port == "" {
 		port = "3000"
 	}
-	log.Println("🚀 Server Golang jalan di http://localhost:" + port)
+	log.Println("🚀 Server Golang berjalan" + port)
 	app.Run(":" + port)
 }
 
 // --- 4. SETUP ROUTER & CORS ---
 func setupRouter() {
-	// Gunakan gin.New() agar lebih ringan di serverless
 	app = gin.New()
 	app.Use(gin.Recovery())
 
-	// Konfigurasi CORS (Agar Frontend di GitHub Pages bisa masuk)
+	// Konfigurasi CORS (Allow All)
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
@@ -71,17 +73,17 @@ func setupRouter() {
 	app.DELETE("/api/lokasi", deleteLokasi)
 }
 
-// --- 5. KONEKSI DATABASE ---
+// --- 5. KONEKSI DATABASE (DENGAN ENV) ---
 func connectDB() {
-	// Cek apakah koneksi sudah ada? Kalau ada, pakai yang lama (Caching)
 	if collection != nil {
 		return
 	}
 
+	// AMBIL DARI ENV (Baik dari file .env atau Settingan Vercel)
 	mongoURI := os.Getenv("MONGO_URI")
+
 	if mongoURI == "" {
-		// Fallback hardcode (Hanya untuk darurat/testing)
-		mongoURI = "mongodb+srv://sriwahyuni_db_user:EgZ2GXRliZQ1TYA7@cluster23.gnmjc2n.mongodb.net/ujianSIG"
+		log.Fatal("❌ FATAL: MONGO_URI tidak ditemukan di .env atau Environment Variables!")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -117,7 +119,7 @@ type Lokasi struct {
 	Koordinat GeoJSON            `json:"koordinat" bson:"koordinat"`
 }
 
-// --- 7. CONTROLLERS (LOGIC) ---
+// --- 7. CONTROLLERS ---
 
 func getLokasi(c *gin.Context) {
 	if collection == nil {
