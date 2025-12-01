@@ -16,8 +16,6 @@ import (
 )
 
 // --- 1. STRUKTUR DATA (MODEL) ---
-// Kita harus mendefinisikan bentuk JSON-nya secara ketat di Go
-
 type GeoJSON struct {
 	Type        string    `json:"type" bson:"type"`
 	Coordinates []float64 `json:"coordinates" bson:"coordinates"`
@@ -35,11 +33,10 @@ var collection *mongo.Collection
 
 // --- 2. KONEKSI DATABASE ---
 func connectDB() {
-	// Ganti dengan Connection String MongoDB Atlas kamu
-	// Tips: Sebaiknya pakai Environment Variable di production
+	// Ambil MONGO_URI dari Environment Variable (Settingan di Vercel)
 	mongoURI := os.Getenv("MONGO_URI")
 	if mongoURI == "" {
-		// Fallback untuk lokal jika tidak ada env (Ganti dengan link Atlasmu jika mau run lokal)
+		// Fallback ke link Atlas kamu jika dijalankan di lokal laptop
 		mongoURI = "mongodb+srv://sriwahyuni_db_user:EgZ2GXRliZQ1TYA7@cluster23.gnmjc2n.mongodb.net/ujianSIG"
 	}
 
@@ -51,44 +48,49 @@ func connectDB() {
 		log.Fatal(err)
 	}
 
-	// Cek koneksi
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatal("Gagal konek MongoDB:", err)
 	}
 
-	log.Println("✅ BERHASIL Konek ke MongoDB (via Golang)")
+	log.Println("✅ BERHASIL Konek ke MongoDB")
 	collection = client.Database("ujianSIG").Collection("lokasis")
 }
 
 func main() {
-	// Koneksi DB
 	connectDB()
 
-	// Setup Router (Gin)
 	r := gin.Default()
 
-	// Setup CORS (Agar frontend bisa akses)
-	r.Use(cors.Default())
+	// --- PERBAIKAN CORS DISINI ---
+	// Kita izinkan semua origin (*) agar Frontend di Localhost maupun GitHub Pages bisa masuk
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept"}
+	
+	r.Use(cors.New(config))
 
 	// --- 3. ROUTES API ---
 
-	// GET: Ambil Data (Semua atau Satu by ID)
+	// GET: Ambil Data
 	r.GET("/api/lokasi", func(c *gin.Context) {
 		idParam := c.Query("id")
 
 		if idParam != "" {
-			// Jika ada ?id=xxx, ambil satu
-			objID, _ := primitive.ObjectIDFromHex(idParam)
+			objID, err := primitive.ObjectIDFromHex(idParam)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+				return
+			}
 			var lokasi Lokasi
-			err := collection.FindOne(context.Background(), bson.M{"_id": objID}).Decode(&lokasi)
+			err = collection.FindOne(context.Background(), bson.M{"_id": objID}).Decode(&lokasi)
 			if err != nil {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Data tidak ditemukan"})
 				return
 			}
 			c.JSON(http.StatusOK, lokasi)
 		} else {
-			// Jika tidak ada ID, ambil semua
 			cursor, err := collection.Find(context.Background(), bson.M{})
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -99,7 +101,6 @@ func main() {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
-			// Agar return array kosong [] bukan null jika data kosong
 			if lokasis == nil {
 				lokasis = []Lokasi{}
 			}
@@ -110,15 +111,13 @@ func main() {
 	// POST: Tambah Data
 	r.POST("/api/lokasi", func(c *gin.Context) {
 		var lokasi Lokasi
-		// Validasi JSON yang masuk
 		if err := c.ShouldBindJSON(&lokasi); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Pastikan GeoJSON valid
 		lokasi.Koordinat.Type = "Point"
-		lokasi.ID = primitive.NewObjectID() // Generate ID baru
+		lokasi.ID = primitive.NewObjectID()
 
 		_, err := collection.InsertOne(context.Background(), lokasi)
 		if err != nil {
@@ -159,7 +158,6 @@ func main() {
 			return
 		}
 
-		// Kembalikan data yang sudah diupdate (termasuk ID lama)
 		updateData.ID = objID
 		c.JSON(http.StatusOK, updateData)
 	})
@@ -182,7 +180,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"message": "Berhasil dihapus"})
 	})
 
-	// Jalankan Server (Support Port ENV untuk Vercel/Render)
+	// Jalankan Server
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
