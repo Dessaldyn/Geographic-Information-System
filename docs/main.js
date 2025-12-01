@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // URL Backend Lokal Kita
     // Ganti ke link backend GO yang baru
-    const apiUrl = 'https://gis-backend-golang.vercel.app/api/lokasi';
+    const apiUrl = 'https://gis-backend-golang.vercel.app';
     // const apiUrl = 'http://localhost:3000/api/lokasi';
 
     // Inisialisasi Peta Leaflet (Default Jakarta)
