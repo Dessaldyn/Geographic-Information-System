@@ -1,4 +1,11 @@
+# Abaikan folder module Node.js (sisa lama)
 node_modules/
-/backend/node_modules/
+
+# Abaikan file environment rahasia
 .env
-.DS_Store
+
+# Abaikan file hasil build/kompilasi Go (file binary)
+backend/main
+backend/*.exe
+*.exe
+*.test
