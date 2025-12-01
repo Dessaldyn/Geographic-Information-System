@@ -1,0 +1,310 @@
+/* Import Font Modern 'Poppins' */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+    --primary-color: #4361ee;
+    --primary-hover: #3a0ca3;
+    --accent-color: #4cc9f0;
+    --bg-color: #f8f9fa;
+    --text-color: #2b2d42;
+    --card-bg: #ffffff;
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header Styling */
+h1 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+h1::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+.main-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+}
+
+/* Peta yang lebih elegan */
+.map-container {
+    flex: 2;
+    min-width: 300px;
+    position: relative;
+}
+
+#map {
+    height: 75vh; /* Tinggi menyesuaikan layar */
+    min-height: 500px;
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    border: 4px solid var(--card-bg);
+    z-index: 1;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    flex: 1;
+    min-width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    height: 75vh;
+    overflow-y: auto; /* Agar sidebar bisa di-scroll terpisah dari peta */
+}
+
+/* Scrollbar cantik untuk sidebar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+
+.form-container, .list-container {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+}
+
+.form-container:hover {
+    transform: translateY(-2px);
+}
+
+h3 {
+    margin-top: 0;
+    color: var(--text-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+p {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* Form Input Styling */
+#lokasi-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input, textarea {
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.coords-group {
+    display: flex;
+    gap: 10px;
+}
+
+.coords-group input {
+    background-color: #e9ecef; /* Memberi kesan Read-Only */
+    color: #495057;
+    font-weight: 500;
+}
+
+/* Button Styling */
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#submit-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    box-shadow: 0 4px 6px rgba(67, 97, 238, 0.3);
+}
+
+#submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(67, 97, 238, 0.4);
+}
+
+#submit-btn:active {
+    transform: translateY(0);
+}
+
+#cancel-btn {
+    background-color: #ffe5e5;
+    color: #e63946;
+}
+#cancel-btn:hover { background-color: #ffcccc; }
+
+/* List Lokasi Keren */
+#lokasi-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Custom Scrollbar untuk list */
+#lokasi-list::-webkit-scrollbar {
+    width: 4px;
+}
+#lokasi-list::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+}
+
+#lokasi-list li {
+    background-color: #fff;
+    padding: 15px;
+    border: 1px solid #f1f3f5;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#lokasi-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: var(--primary-color);
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+#lokasi-list li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-color: var(--primary-color);
+}
+
+.list-item-info strong {
+    display: block;
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-bottom: 4px;
+}
+
+.list-item-info span {
+    font-size: 0.8rem;
+    color: #adb5bd;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    background: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.action-buttons button {
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.edit-btn { 
+    background-color: #fff9db;
+    color: #fcc419; 
+}
+.edit-btn:hover { background-color: #fff3bf; }
+
+.delete-btn { 
+    background-color: #ffe3e3;
+    color: #ff6b6b; 
+}
+.delete-btn:hover { background-color: #ffc9c9; }
+
+.hidden { display: none; }
+
+/* Responsive Mobile */
+@media (max-width: 900px) {
+    .main-content {
+        flex-direction: column;
+    }
+    
+    .map-container {
+        height: 50vh;
+    }
+
+    #map {
+        height: 100%;
+    }
+
+    .sidebar {
+        height: auto;
+        overflow-y: visible;
+    }
+}
